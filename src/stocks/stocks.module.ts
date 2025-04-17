@@ -4,7 +4,7 @@ import { StocksService } from './stocks.service';
 import { StocksController } from './stocks.controller';
 
 @Module({
-  imports: [HttpModule],
+  /* imports: [HttpModule], */ // remove if works globally
   providers: [StocksService],
   controllers: [StocksController]
 })
