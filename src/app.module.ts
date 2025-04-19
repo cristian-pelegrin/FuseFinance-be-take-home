@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { HttpModule } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { StocksModule } from './stocks/stocks.module';
-import { HoldingsModule } from './holdings/holdings.module';
-import { TransactionsModule } from './transactions/transactions.module';
+
+import { StocksModule } from 'src/stocks/stocks.module';
+import { HoldingsModule } from 'src/holdings/holdings.module';
+import { TransactionsModule } from 'src/transactions/transactions.module';
+import { FuseModule } from 'src/fuse/fuse.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    HttpModule.register({ global: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
@@ -20,11 +20,11 @@ import { TransactionsModule } from './transactions/transactions.module';
         logging: true,
       }),
       inject: [ConfigService],
-      // later: HoldingsModule, TransactionsModule
     }),
     StocksModule,
     HoldingsModule,
     TransactionsModule,
+    FuseModule,
   ],
 })
 export class AppModule {}

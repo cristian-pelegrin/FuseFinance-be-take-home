@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
-import { StocksService } from './stocks.service';
-import { StocksController } from './stocks.controller';
+
+import { FuseModule } from 'src/fuse/fuse.module';
+import { StocksService } from 'src/stocks/stocks.service';
+import { StocksController } from 'src/stocks/stocks.controller';
 
 @Module({
-  /* imports: [HttpModule], */ // remove if works globally
+  imports: [FuseModule],
   providers: [StocksService],
   controllers: [StocksController]
 })

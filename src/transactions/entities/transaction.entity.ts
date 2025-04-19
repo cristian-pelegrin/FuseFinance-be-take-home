@@ -1,5 +1,10 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
+export enum TransactionStatus {
+  PENDING = 'pending',
+  SUCCESS = 'success',
+  FAILED = 'failed',
+}
 @Entity()
 export class Transaction {
   @PrimaryGeneratedColumn()
@@ -9,13 +14,17 @@ export class Transaction {
   symbol: string;
 
   @Column('float')
-  amount: number;
+  quantity: number;
 
   @Column('float')
   price: number;
 
-  @Column()
-  status: 'success' | 'failed';
+  @Column({
+    type: 'text',
+    enum: TransactionStatus,
+    default: TransactionStatus.PENDING
+  })
+  status: TransactionStatus;
 
   @Column({ nullable: true })
   errorMessage?: string;

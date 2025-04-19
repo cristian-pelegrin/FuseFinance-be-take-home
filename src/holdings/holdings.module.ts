@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
-import { HoldingsService } from './holdings.service';
-import { HoldingsController } from './holdings.controller';
+
+import { HoldingsService } from 'src/holdings/holdings.service';
+import { HoldingsController } from 'src/holdings/holdings.controller';
 
 @Module({
   controllers: [HoldingsController],
