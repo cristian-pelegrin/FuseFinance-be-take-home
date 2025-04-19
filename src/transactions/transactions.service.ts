@@ -1,5 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import { Between, DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { FuseApiService } from 'src/fuse/fuse-api/fuse-api.service';
@@ -66,5 +66,12 @@ export class TransactionsService {
                 );
             }
         }
+    }
+
+    async getTransactionsInRange(start: Date, end: Date): Promise<Transaction[]> {
+        return this.transactionRepo.find({
+            where: { createdAt: Between(start, end) },
+            order: { createdAt: 'ASC' },
+        });
     }
 }

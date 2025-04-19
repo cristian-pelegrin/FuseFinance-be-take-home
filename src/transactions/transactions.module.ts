@@ -13,5 +13,6 @@ import { Transaction } from 'src/transactions/entities/transaction.entity';
   ],
   controllers: [TransactionsController],
   providers: [TransactionsService],
+  exports: [TransactionsService],
 })
 export class TransactionsModule {}
