@@ -15,8 +15,12 @@ import { ReportsModule } from 'src/reports/reports.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
-        type: config.get<'sqlite'>('DB_TYPE'),
-        database: config.get<string>('DB_DATABASE'),
+        type: 'postgres',
+        host: config.get('DB_HOST'),
+        port: config.get('DB_PORT'),
+        username: config.get('DB_USERNAME'),
+        password: config.get('DB_PASSWORD'),
+        database: config.get('DB_DATABASE'),
         entities: [__dirname + '/**/entities/*.entity{.ts,.js}'],
         synchronize: process.env.NODE_ENV !== 'production', // use ONLY for development
         logging: false,

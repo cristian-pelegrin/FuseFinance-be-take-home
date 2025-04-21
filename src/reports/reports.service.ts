@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import * as dayjs from 'dayjs';
 
-import { AbstractMailerService } from 'src/reports/mailer/mailer.interface';
+import { MailerService } from 'src/reports/mailer/mailer.interface';
 import { TransactionsService } from 'src/transactions/transactions.service';
 import { Transaction } from 'src/transactions/entities/transaction.entity';
 
@@ -11,7 +11,7 @@ export class ReportsService {
   private readonly logger = new Logger(ReportsService.name);
 
   constructor(
-    private readonly mailerService: AbstractMailerService,
+    private readonly mailerService: MailerService,
     private readonly transactionsService: TransactionsService,
   ) {}
 
