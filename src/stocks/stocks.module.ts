@@ -5,7 +5,9 @@ import { StocksService } from 'src/stocks/stocks.service';
 import { StocksController } from 'src/stocks/stocks.controller';
 
 @Module({
-  imports: [FuseModule],
+  imports: [
+    FuseModule,
+  ],
   providers: [StocksService],
   controllers: [StocksController]
 })

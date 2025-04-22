@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CacheModule } from '@nestjs/cache-manager';
+import { createKeyv } from '@keyv/redis';
 
 import { StocksModule } from 'src/stocks/stocks.module';
 import { HoldingsModule } from 'src/holdings/holdings.module';
@@ -25,6 +27,18 @@ import { ReportsModule } from 'src/reports/reports.module';
         synchronize: process.env.NODE_ENV !== 'production', // use ONLY for development
         logging: false,
       }),
+      inject: [ConfigService],
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      useFactory: async (config: ConfigService) => {
+        return {
+          stores: [
+            createKeyv(`redis://${config.get('REDIS_HOST')}:${config.get('REDIS_PORT')}`),
+          ],
+        };
+      },
       inject: [ConfigService],
     }),
     ScheduleModule.forRoot(),

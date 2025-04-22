@@ -1,8 +1,13 @@
+export class StockItemResponseDto {
+  symbol: string;
+  name: string;
+  sector: string;
+  price: number;
+  change: number;
+  lastUpdated: string;
+}
+
 export class StockResponseDto {
-    symbol: string;
-    name: string;
-    sector: string;
-    price: number;
-    change: number;
-    lastUpdated: string;
-  }
+  items: StockItemResponseDto[];
+  nextToken?: string;
+}

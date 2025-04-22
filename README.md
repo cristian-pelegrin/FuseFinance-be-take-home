@@ -48,6 +48,7 @@ DB_DATABASE=fusedb
 # Redis
 REDIS_HOST=redis
 REDIS_PORT=6379
+REDIS_DEFAULT_TTL=60000
 
 # Fuse API
 FUSE_API_URL=your_fuse_api_url
@@ -97,8 +98,9 @@ The Docker Compose setup includes the following services:
    - Default credentials in .env file
 
 3. **Redis**
-   - Used for caching
+   - Used for caching stock data
    - Exposed on port 6379
+   - Default TTL: 60 seconds
 
 4. **Mailhog** (Development Email Service)
    - SMTP server for development
