@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { ConfigService } from '@nestjs/config';
 import * as dayjs from 'dayjs';
 
 import { MailerService } from 'src/reports/mailer/mailer.interface';
@@ -13,6 +14,7 @@ export class ReportsService {
   constructor(
     private readonly mailerService: MailerService,
     private readonly transactionsService: TransactionsService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Cron(CronExpression.EVERY_DAY_AT_7AM)
@@ -23,7 +25,7 @@ export class ReportsService {
     const report = this.buildEmailBody(transactions);
 
     await this.mailerService.sendReportEmail(
-      'recipient@example.com',
+      this.configService.get('EMAIL_REPORT_RECIPIENT') || 'test@test.com',
       'Daily Transaction Report',
       report,
       true // Enable HTML formatting
@@ -31,8 +33,8 @@ export class ReportsService {
   }
 
   private async getYesterdayTransactions(): Promise<Transaction[]> {
-    const start = dayjs().subtract(0, 'day').startOf('day').toDate();
-    const end = dayjs().subtract(0, 'day').endOf('day').toDate();
+    const start = dayjs().subtract(1, 'day').startOf('day').toDate();
+    const end = dayjs().subtract(1, 'day').endOf('day').toDate();
 
     return this.transactionsService.getTransactionsInRange(start, end);
   }

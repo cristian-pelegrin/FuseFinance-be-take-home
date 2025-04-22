@@ -10,14 +10,6 @@ This application provides:
 - Transaction history tracking
 - Automated daily email reports of transactions
 
-## Email Service Implementation
-
-The project implements a flexible email service with two modes:
-- **Development Mode**: Uses Ethereal Email (test email service) for development and testing
-- **Production Mode**: Uses a real SMTP server for production environments
-
-The email service is configured through environment variables and automatically switches between development and production modes based on the `NODE_ENV` setting.
-
 ## Prerequisites
 
 - Node.js (v20 or higher)
@@ -54,11 +46,13 @@ REDIS_DEFAULT_TTL=60000
 FUSE_API_URL=your_fuse_api_url
 FUSE_API_KEY=your_fuse_api_key
 
-# Email Configuration (only required for production)
+# Email Configuration
+EMAIL_REPORT_RECIPIENT=test@test.com
 SMTP_HOST=mailhog
 SMTP_PORT=1025
 SMTP_SECURE=false
 SMTP_FROM=no-reply@fuse.local
+# Email Configuration (only required for production)
 SMTP_USER=
 SMTP_PASS=
 ```
@@ -125,34 +119,18 @@ While Docker is recommended, you can run the application locally:
 
    # watch mode
    $ npm run start:dev
-
-   # production mode
-   $ npm run start:prod
    ```
 
 ## Testing
 
-### Running Tests with Docker
-
-```bash
-# Run all tests in Docker environment
-$ docker compose run --rm app npm run test
-
-# Run e2e tests
-$ docker compose run --rm app npm run test:e2e
-
-# Run tests with coverage
-$ docker compose run --rm app npm run test:cov
-```
-
-### Running Tests Locally
+### Running Tests
 
 ```bash
 # unit tests
 $ npm run test
 
-# e2e tests
-$ npm run test:e2e
+# e2e tests - run in Docker environment
+$ docker compose run --rm app npm run test:e2e
 
 # test coverage
 $ npm run test:cov
@@ -166,17 +144,43 @@ $ npm run test:cov
 - `src/reports/` - Daily email report generation
 - `src/fuse/` - Fuse API integration
 
-## API Endpoints
+## Decisions and Assumptions
+
+### Architectural Decisions
+- **Framework**: Chose NestJS for its modular architecture and built-in support for TypeScript.
+- **Database**: Used PostgreSQL for its robustness and support for complex queries.
+- **Caching**: Implemented Redis for caching stock data to improve performance and reduce API calls.
+- **Retry Logic**: Added retry logic with exponential backoff for Fuse API calls to handle potential unreliability.
+- **Email Service**: Used Mailhog for development email testing, assumed SMTP configuration for production.
+- **Daily Email Report**: Implemented using NestJS's cron feature to schedule and send daily email reports. This approach simplifies the take-home solution by keeping all functionality within the application, reducing complexity and dependencies. However, in a real production environment, it would be advisable to use a more scalable and resource-efficient solution, such as AWS Lambda combined with CloudWatch. This would allow the scheduling and execution of tasks without consuming server resources, providing better scalability and cost-effectiveness.
+
+### Assumptions
+- **Stock Price Volatility**: Assumed stock prices could change every 1 minute, cached data accordingly.
+
+### Testing Decisions
+- **Unit Tests**: Added one unit test per service to demonstrate basic functionality and ensure core logic is working as expected.
+- **End-to-End Tests**: Implemented one end-to-end test to showcase the integration of different components and the overall workflow.
+- **Production Considerations**: In a real production project, I would aim for more comprehensive test coverage, including non-happy paths and edge cases, to ensure robustness and reliability.
+
+## Notes
+- Docker Compose is the recommended way to run the application as it ensures all dependencies and services are properly configured
+- The server is running locally on [http://localhost:3000](http://localhost:3000)
+- Mailhog web interface is available at [http://localhost:8025](http://localhost:8025) for viewing development emails
+
+## API Documentation
+
+To interact with the API, you can use the provided Postman collection.
+
+### Importing the Postman Collection
+
+1. Open Postman.
+2. Click on "Import" in the top left corner.
+3. Select the `postman/Fuse_Take_Home.postman_collection.json` file from this repository.
+4. The collection will be imported, and you can use it to make requests to the API.
+
+### Available Endpoints
 
 - `GET /stocks` - List available stocks
 - `POST /transactions` - Create a new stock transaction
 - `GET /holdings` - Get current portfolio holdings
 
-## Notes
-
-- The application uses PostgreSQL for data storage
-- Email reports are generated every 10 seconds in development mode for testing purposes
-- The server is running locally on [http://localhost:3000](http://localhost:3000)
-- Mailhog web interface is available at [http://localhost:8025](http://localhost:8025) for viewing development emails
-- All services are configured through environment variables
-- Docker Compose is the recommended way to run the application as it ensures all dependencies and services are properly configured
