@@ -15,7 +15,7 @@ export class ReportsService {
     private readonly transactionsService: TransactionsService,
   ) {}
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_DAY_AT_7AM)
   async handleDailyReport() {
     this.logger.log('Generating daily transaction report...');
     

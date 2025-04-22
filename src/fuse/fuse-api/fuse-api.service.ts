@@ -31,6 +31,8 @@ interface BuyStockResponseData {
 export class FuseApiService {
   private readonly apiUrl: string;
   private readonly apiKey: string;
+  private readonly defaultRetries = 1;
+  private readonly baseDelay = 1000; // 1 second
 
   constructor(
     private readonly http: HttpService,
@@ -47,35 +49,63 @@ export class FuseApiService {
     this.apiKey = apiKey;
   }
 
-  async getStocks(nextToken?: string): Promise<AxiosResponse<{ data: StocksResponseData }>> {
-    try {
-      const response$ = this.http.get<{ data: StocksResponseData }>(`${this.apiUrl}/stocks`, {
-        headers: { 'x-api-key': this.apiKey },
-        params: nextToken ? { nextToken } : {},
-      });
-      const response = await firstValueFrom(response$);
-      return response;
-    } catch (error) {
-      this.handleApiError(error);
-    }
-  }
-
-  async buyStock(symbol: string, quantity: number, price: number): Promise<AxiosResponse<{ data: BuyStockResponseData }>> {
-    try {
-      const response$ = this.http.post<{ data: BuyStockResponseData }>(
-        `${this.apiUrl}/stocks/${symbol}/buy`,
-        { quantity, price },
-        {
+  async getStocks(nextToken?: string, retries?: number): Promise<AxiosResponse<{ data: StocksResponseData }>> {
+    return this.retryWithBackoff(async () => {
+      try {
+        const response$ = this.http.get<{ data: StocksResponseData }>(`${this.apiUrl}/stocks`, {
           headers: { 'x-api-key': this.apiKey },
-        }
-      );
-      const response = await firstValueFrom(response$);
-      return response;
+          params: nextToken ? { nextToken } : {},
+        });
+        const response = await firstValueFrom(response$);
+        return response;
+      } catch (error) {
+        this.handleApiError(error);
+      }
+    }, retries);
+  }
+
+  async buyStock(symbol: string, quantity: number, price: number, retries?: number): Promise<AxiosResponse<{ data: BuyStockResponseData }>> {
+    return this.retryWithBackoff(async () => {
+      try {
+        const response$ = this.http.post<{ data: BuyStockResponseData }>(
+          `${this.apiUrl}/stocks/${symbol}/buy`,
+          { quantity, price },
+          {
+            headers: { 'x-api-key': this.apiKey },
+          }
+        );
+        
+        const response = await firstValueFrom(response$);
+        return response;
+      } catch (error) {
+        this.handleApiError(error);
+      }
+    }, retries);
+  }
+
+   /**
+   * Retries a failed operation with exponential backoff
+   */
+   private async retryWithBackoff<T>(
+    operation: () => Promise<T>,
+    retries: number = this.defaultRetries,
+    attempt: number = 1
+  ): Promise<T> {
+    try {
+      return await operation();
     } catch (error) {
-      this.handleApiError(error);
+      if (error.status === HttpStatus.INTERNAL_SERVER_ERROR && attempt < retries) {
+        const delay = this.baseDelay * Math.pow(2, attempt - 1); // exponential backoff
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return this.retryWithBackoff(operation, retries, attempt + 1);
+      }
+      throw error;
     }
   }
 
+  /**
+   * @throws {FuseApiException}
+   */
   private handleApiError(error: any): never {
     if (error instanceof AxiosError && error.response) {
       const status = error.response.status;

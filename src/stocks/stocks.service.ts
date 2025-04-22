@@ -25,7 +25,7 @@ export class StocksService {
         }
     
         try {
-            const response = await this.fuseApi.getStocks(nextToken);
+            const response = await this.fuseApi.getStocks(nextToken, 3);
             const data: StockResponseDto = response.data.data;
 
             if (!Array.isArray(data.items)) {

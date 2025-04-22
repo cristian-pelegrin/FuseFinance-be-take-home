@@ -61,9 +61,6 @@ SMTP_SECURE=false
 SMTP_FROM=no-reply@fuse.local
 SMTP_USER=
 SMTP_PASS=
-
-# Report Generation
-REPORT_CRON_EXPRESSION=*/10 * * * * *
 ```
 
 ## Running the Application

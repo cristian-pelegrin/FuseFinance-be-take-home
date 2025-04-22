@@ -29,7 +29,7 @@ export class TransactionsService {
         await this.transactionRepo.save(transaction);
         
         try {
-            await this.fuseApi.buyStock(symbol, quantity, price);
+            await this.fuseApi.buyStock(symbol, quantity, price, 3);
             
             await this.dataSource.transaction(async (manager) => {
                 transaction.status = TransactionStatus.SUCCESS;
