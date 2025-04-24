@@ -4,7 +4,7 @@ import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { FuseApiService } from 'src/fuse/fuse-api/fuse-api.service';
 import { StockResponseDto } from 'src/stocks/dtos/stock-response.dto';
 
-const STOCKS_CACHE_TTL = 60000; // 60 seconds
+const STOCKS_CACHE_TTL = 150000; // 2.5 minutes
 const getStocksCacheKey = (nextToken?: string) => `stocks:page:${nextToken || 'first'}`;
 @Injectable()
 export class StocksService {

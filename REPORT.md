@@ -7,9 +7,7 @@
 - **Retry Logic**: Added retry logic with exponential backoff for Fuse API calls to handle potential unreliability.
 - **Email Service**: Used Mailhog for development email testing, assumed SMTP configuration for production.
 - **Daily Email Report**: Implemented using NestJS's cron feature to schedule and send daily email reports. This approach simplifies the take-home solution by keeping all functionality within the application, reducing complexity and dependencies. However, in a real production environment, it would be advisable to use a more scalable and resource-efficient solution, such as AWS Lambda combined with CloudWatch. This would allow the scheduling and execution of tasks without consuming server resources, providing better scalability and cost-effectiveness.
-
-### Assumptions
-- **Stock Price Volatility**: Assumed stock prices could change every 1 minute, cached data accordingly.
+- **Stock Price Cache TTL**: Set cache TTL to 2.5 minutes to balance between data freshness and API efficiency, since vendor updates prices every 5 minutes. Using a 5-minute cache would mean potentially serving outdated data right before the vendor updates.
 
 ### Testing Decisions
 - **Unit Tests**: Added one unit test per service to demonstrate basic functionality and ensure core logic is working as expected.
